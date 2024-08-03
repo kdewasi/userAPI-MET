@@ -68,67 +68,74 @@ app.post("/api/user/login", (req, res) => {
             userName: user.userName,
           };
         let token = jwt.sign(payload, process.env.JWT_SECRET);
-        res.json({ "message": "login successful", token: token});
+        res.json({ "message": "login successful", token: token });
     }).catch(msg => {
         res.status(422).json({ "message": msg });
     });
 });
 
-app.get("/api/user/favourites", (req, res) => {
+app.get("/api/user/favourites", passport.authenticate('jwt', { session: false }), (req, res) => {
     userService.getFavourites(req.user._id)
     .then(data => {
         res.json(data);
     }).catch(msg => {
         res.status(422).json({ error: msg });
-    })
-
+    });
 });
 
-app.put("/api/user/favourites/:id", (req, res) => {
+app.put("/api/user/favourites/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
     userService.addFavourite(req.user._id, req.params.id)
     .then(data => {
-        res.json(data)
+        res.json(data);
     }).catch(msg => {
         res.status(422).json({ error: msg });
-    })
+    });
 });
 
-app.delete("/api/user/favourites/:id", (req, res) => {
+app.delete("/api/user/favourites/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
     userService.removeFavourite(req.user._id, req.params.id)
     .then(data => {
-        res.json(data)
+        res.json(data);
     }).catch(msg => {
         res.status(422).json({ error: msg });
-    })
+    });
 });
 
-app.get("/api/user/history", (req, res) => {
+app.get("/api/user/history", passport.authenticate('jwt', { session: false }), (req, res) => {
     userService.getHistory(req.user._id)
     .then(data => {
         res.json(data);
     }).catch(msg => {
         res.status(422).json({ error: msg });
-    })
-
+    });
 });
 
-app.put("/api/user/history/:id", (req, res) => {
+app.put("/api/user/history/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
     userService.addHistory(req.user._id, req.params.id)
     .then(data => {
-        res.json(data)
+        res.json(data);
     }).catch(msg => {
         res.status(422).json({ error: msg });
-    })
+    });
 });
 
-app.delete("/api/user/history/:id", (req, res) => {
+app.delete("/api/user/history/:id", passport.authenticate('jwt', { session: false }), (req, res) => {
     userService.removeHistory(req.user._id, req.params.id)
     .then(data => {
-        res.json(data)
+        res.json(data);
     }).catch(msg => {
         res.status(422).json({ error: msg });
-    })
+    });
 });
+
+// Add a basic route for health check
+app.get("/", (req, res) => {
+    res.send("API is Listening");
+});
+
+// Log environment variables to verify
+console.log("MONGODB_URI:", process.env.MONGODB_URI);
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
 userService.connect()
 .then(() => {
